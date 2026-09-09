@@ -1483,9 +1483,9 @@ public class TreeRun extends ComplexStateQuestHelper
 		var farmingGuildPanel = new TopLevelPanelDetails("Farming Guild",
 			farmingGuildTreePanel, farmingGuildFruitPanel).withId(0);
 		farmingGuildPanel.setLockingStep(farmingGuildStep);
-		farmingGuildPanel.setHideCondition(or(
-			and(not(accessToFarmingGuildTreePatch), not(accessToFarmingGuildFruitTreePatch)),
-			and(not(treesEnabled), not(fruitTreesEnabled))));
+		farmingGuildPanel.setHideCondition(and(
+			or(not(treesEnabled), not(accessToFarmingGuildTreePatch)),
+			or(not(fruitTreesEnabled), not(accessToFarmingGuildFruitTreePatch))));
 
 		PanelDetails lumbridgePanel = new PanelDetails("Lumbridge", Arrays.asList(lumbridgeTreePatchCheckHealth, lumbridgeTreePatchCutDown, lumbridgeTreePatchDig, lumbridgeTreePatchClear, lumbridgeTreePatchPlant, lumbridgeTreeProtect)).withId(1);
 		lumbridgePanel.setLockingStep(lumbridgeStep);
@@ -1569,7 +1569,7 @@ public class TreeRun extends ComplexStateQuestHelper
 
 		PanelDetails auburnvalePanel = new PanelDetails("Auburnvale", Arrays.asList(auburnvaleTreePatchCheckHealth, auburnvaleTreePatchCutDown, auburnvaleTreePatchDig, auburnvaleTreePatchClear, auburnvaleTreePatchPlant, auburnvaleTreeProtect)).withId(12);
 		auburnvalePanel.setLockingStep(auburnvaleStep);
-		auburnvalePanel.setHideCondition(or(not(accessToVarlamore), not(hardwoodEnabled)));
+		auburnvalePanel.setHideCondition(or(not(accessToVarlamore), not(treesEnabled)));
 
 		PanelDetails kastoriFruitPanel = new PanelDetails("Fruit Tree Patch", Arrays.asList(kastoriFruitTreePatchCheckHealth, kastoriFruitTreePatchCutDown, kastoriFruitTreePatchDig, kastoriFruitTreePatchClear, kastoriFruitTreePatchPlant, kastoriFruitProtect)).withId(131);
 		kastoriFruitPanel.setLockingStep(kastoriFruitStep);
