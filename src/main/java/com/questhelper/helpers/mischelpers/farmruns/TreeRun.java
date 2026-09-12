@@ -474,14 +474,14 @@ public class TreeRun extends ComplexStateQuestHelper
 		// Fruit trees
 		catherbyStates = new PatchStates("Catherby", fruitTreesEnabled);
 		brimhavenStates = new PatchStates("Brimhaven", fruitTreesEnabled);
-		taiBwoWannaiStates = new PatchStates("Tai Bwo Wannai", and(accessToCalquatFarming, fruitTreesEnabled));
+		taiBwoWannaiStates = new PatchStates("Tai Bwo Wannai", and(accessToCalquatFarming, calquatEnabled));
 		gnomeVillageStates = new PatchStates("Tree Gnome Village", fruitTreesEnabled);
 		gnomeStrongholdFruitStates = new PatchStates("Gnome Stronghold", fruitTreesEnabled);
 		lletyaStates = new PatchStates("Lletya", and(accessToLletya, fruitTreesEnabled));
 		farmingGuildFruitStates = new PatchStates("Farming Guild", and(accessToFarmingGuildFruitTreePatch, fruitTreesEnabled));
 		kastoriFruitStates = new PatchStates("Kastori", and(accessToVarlamore, fruitTreesEnabled));
-		kastoriCalquatStates = new PatchStates("Kastori", and(accessToVarlamore, accessToCalquatFarming, fruitTreesEnabled));
-		greatConchStates = new PatchStates("Great Conch", and(accessToGreatConch, accessToCalquatFarming, fruitTreesEnabled));
+		kastoriCalquatStates = new PatchStates("Kastori", and(accessToVarlamore, accessToCalquatFarming, calquatEnabled));
+		greatConchStates = new PatchStates("Great Conch", and(accessToGreatConch, accessToCalquatFarming, calquatEnabled));
 
 		westHardwoodStates = new PatchStates("Fossil Island", "West");
 		middleHardwoodStates = new PatchStates("Fossil Island", "Middle");
@@ -1537,7 +1537,7 @@ public class TreeRun extends ComplexStateQuestHelper
 
 		var karamjaPanel = new TopLevelPanelDetails("Karamja", brimhavenPanel, taiBwoWannaiPanel).withId(8);
 		karamjaPanel.setLockingStep(karamjaStep);
-		karamjaPanel.setHideCondition(and(not(fruitTreesEnabled), not(calquatEnabled)));
+		karamjaPanel.setHideCondition(and(not(fruitTreesEnabled), or(not(accessToCalquatFarming), not(calquatEnabled))));
 
 		PanelDetails lletyaPanel = new PanelDetails("Lletya", Arrays.asList(lletyaFruitTreePatchCheckHealth, lletyaFruitTreePatchCutDown, lletyaFruitTreePatchDig, lletyaFruitTreePatchClear, lletyaFruitTreePatchPlant, lletyaFruitProtect)).withId(9);
 		lletyaPanel.setLockingStep(lletyaStep);
@@ -1581,7 +1581,7 @@ public class TreeRun extends ComplexStateQuestHelper
 
 		var kastoriPanel = new TopLevelPanelDetails("Kastori", kastoriFruitPanel, kastoriCalquatPanel).withId(13);
 		kastoriPanel.setLockingStep(kastoriStep);
-		kastoriPanel.setHideCondition(or(not(accessToVarlamore), and(not(fruitTreesEnabled), not(calquatEnabled))));
+		kastoriPanel.setHideCondition(or(not(accessToVarlamore), and(not(fruitTreesEnabled), or(not(accessToCalquatFarming), not(calquatEnabled)))));
 
 		PanelDetails anglersPanel = new PanelDetails("Anglers' Retreat", Arrays.asList(anglersCheckHealth,
 			anglersCutDown, anglersDig, anglersClear, anglersPlant, anglersProtect)).withId(14);
