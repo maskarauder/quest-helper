@@ -490,6 +490,14 @@ public class TreeRun extends ComplexStateQuestHelper
 		anglersRetreatStates = new PatchStates("Anglers' Retreat", and(accessToAnglersRetreat, hardwoodEnabled));
 
 		allGrowing = and(
+			// At least one type must be enabled
+			or(
+				treesEnabled,
+				fruitTreesEnabled,
+				hardwoodEnabled,
+				calquatEnabled
+			),
+
 			// Tree patches
 			or(not(treesEnabled),
 				and(lumbridgeStates.getIsGrowing(),
@@ -551,7 +559,7 @@ public class TreeRun extends ComplexStateQuestHelper
 		calquatEnabled = not(new RuneliteRequirement(configManager, CALQUAT_TREE_SAPLING, CalquatTreeSapling.NONE.name()));
 
 		TreeSapling treeSaplingEnum = (TreeSapling) FarmingUtils.getEnumFromConfig(configManager, TreeSapling.MAGIC);
-		treeSapling = treeSaplingEnum.getPlantableItemRequirement(itemManager).showConditioned(not(treesEnabled));
+		treeSapling = treeSaplingEnum.getPlantableItemRequirement(itemManager).showConditioned(treesEnabled);
 		treeSapling.setHighlightInInventory(true);
 		allTreeSaplings = treeSapling.copy();
 
