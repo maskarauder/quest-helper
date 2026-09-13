@@ -391,6 +391,7 @@ public class QuestHelperTest extends MockedTest
 			QuestHelperQuest.VAMPYRE_SLAYER,
 			QuestHelperQuest.HERB_RUN,
 			QuestHelperQuest.THE_IDES_OF_MILK
+			//QuestHelperQuest.CRAB_QUEST
 		);
 
 		// If you add a quest to this list, then this unit test will *only* test this quest
