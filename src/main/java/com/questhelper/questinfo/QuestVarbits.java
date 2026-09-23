@@ -132,7 +132,7 @@ public enum QuestVarbits
 	QUEST_THE_RED_REEF(VarbitID.TRR),
 	QUEST_THE_BLOOD_MOON_RISES(VarbitID.MYQ6),
 	QUEST_FALLEN_FROM_GRACE(VarbitID.FFG),
-	QUEST_CRAB_QUEST(15868 /* VarbitID.CRABQUEST */),
+	QUEST_CRAB_QUEST(VarbitID.CRAB_MAIN),
 	/**
 	 * mini-quest varbits, these don't hold the completion value.
 	 */
