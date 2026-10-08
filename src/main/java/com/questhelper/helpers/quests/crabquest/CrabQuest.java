@@ -33,7 +33,6 @@ import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 
 
-@SuppressWarnings("SpellCheckingInspection")
 public class CrabQuest extends BasicQuestHelper
 {
 	// Initial Reqs
