@@ -390,8 +390,8 @@ public class QuestHelperTest extends MockedTest
 			QuestHelperQuest.THE_BLOOD_MOON_RISES,
 			QuestHelperQuest.VAMPYRE_SLAYER,
 			QuestHelperQuest.HERB_RUN,
-			QuestHelperQuest.THE_IDES_OF_MILK
-			//QuestHelperQuest.CRAB_QUEST
+			QuestHelperQuest.THE_IDES_OF_MILK,
+			QuestHelperQuest.CRAB_QUEST
 		);
 
 		// If you add a quest to this list, then this unit test will *only* test this quest
@@ -403,6 +403,11 @@ public class QuestHelperTest extends MockedTest
 		when(client.getRealSkillLevel(Skill.FARMING)).thenReturn(99);
 		when(client.getIntStack()).thenReturn(new int[]{2});
 		when(client.getVarbitValue(VarbitID.MORYTANIA_ELITE_REWARD)).thenReturn(1);
+
+		// Used to simulate the criteria for resetFLoatsam to appear in the side panel.
+		// Can remove this and modify the side panel behavior if it's preferred.
+		when(client.getVarbitValue(VarbitID.CRAB_MAIN)).thenReturn(37);
+		when(client.getVarbitValue(VarbitID.CRAB_FLOATSAM_HIDDEN)).thenReturn(3);
 
 		AchievementDiaryStepManager.setup(configManager);
 
