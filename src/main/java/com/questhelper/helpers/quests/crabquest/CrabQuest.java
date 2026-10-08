@@ -8,64 +8,62 @@ import com.questhelper.requirements.conditional.NpcCondition;
 import com.questhelper.requirements.item.ItemRequirement;
 import com.questhelper.requirements.player.FreeInventorySlotRequirement;
 import com.questhelper.requirements.player.SkillRequirement;
+import static com.questhelper.requirements.util.LogicHelper.and;
+import static com.questhelper.requirements.util.LogicHelper.not;
+import static com.questhelper.requirements.util.LogicHelper.or;
+import com.questhelper.requirements.util.Operation;
 import com.questhelper.requirements.var.VarbitRequirement;
 import com.questhelper.rewards.ExperienceReward;
 import com.questhelper.rewards.QuestPointReward;
 import com.questhelper.rewards.UnlockReward;
 import com.questhelper.steps.ConditionalStep;
-import com.questhelper.steps.EmoteStep;
 import com.questhelper.steps.ItemStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
 import com.questhelper.steps.QuestStep;
-import net.runelite.api.World;
-import net.runelite.api.gameval.NpcID;
-import net.runelite.api.gameval.ObjectID;
-import net.runelite.api.Skill;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.ItemID;
-import net.runelite.api.gameval.VarbitID;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static com.questhelper.requirements.util.LogicHelper.*;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.NpcID;
+import net.runelite.api.gameval.ObjectID;
+import net.runelite.api.gameval.VarbitID;
 
 
+@SuppressWarnings("SpellCheckingInspection")
 public class CrabQuest extends BasicQuestHelper
 {
 	// Initial Reqs
 	SkillRequirement sailingLevel;
 	SkillRequirement fishingLevel;
 	ItemRequirement bigFishingNet;
-	FreeInventorySlotRequirement nineSlots;
+	FreeInventorySlotRequirement nineSlots, threeSlots, twoSlots, oneSlot;
 
 	// Quest Reqs
 	ItemRequirement shellOne, shellTwo, shellThree, shellFour, shellFive, shellSix, shellSeven;
-	ItemRequirement seasoakedBowstring, batteredBarrel, weatheredRosewoodPlank;
+	ItemRequirement seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank;
 	ItemRequirement instrument;
-	VarbitRequirement inQuestInstance;
+	VarbitRequirement inQuestInstance, beforeFishing, pastFishing, penguinKicked, sufficientBandmatesRecruited;
+	Requirement shellOneObtained, shellTwoObtained, shellThreeObtained, shellFourObtained, shellFiveObtained,
+		shellSixObtained, shellSevenObtained, shellsObtained;
+	Conditions floatsamPresent;
+	NpcCondition penguinPresent;
 
 	// Steps
 	ObjectStep drinkFromBottle;
 	NpcStep talkToCrab, talkToCrabButHesShy;
-	Requirement shell1Obtained, shell2Obtained, shell3Obtained, shell4Obtained, shell5Obtained, shell6Obtained,
-	           shell7Obtained, shellsObtained;
 	ItemStep pickUpShellOne, pickUpShellTwo, pickUpShellThree, pickUpShellFour, pickUpShellFive, pickUpShellSix,
-	           pickUpShellSeven;
+		pickUpShellSeven;
 	NpcStep turnInShells;
-
-	ItemStep pickUpBigNet;
-	Conditions floatsamPresent;
-	NpcStep resetFloatsam, fishSeasoakedBowstring, fishBatteredBarrel, fishWeatheredRosewoodPlank;
+	ItemStep pickUpBigFishingNet;
+	NpcStep resetFloatsam, fishSeaSoakedBowstring, fishBatteredBarrel, fishWeatheredRosewoodPlank;
 	ItemStep assembleInstrument;
 	NpcStep turnInInstrument;
-
-	VarbitRequirement penguinKicked, partialComplete;
-	NpcCondition penguinRevealed;
-	CrabStep crab1, crab2, crab3, crab4, crab5, crab6, crab7, crab8, crab9, crab10, crab11;
-
-	NpcStep returnToTheBeach;
+	ObjectStep findPenguin, findCrabs;
+	NpcStep kickPenguin, returnToTheBeach;
 
 	@Override
 	protected void setupRequirements()
@@ -78,6 +76,9 @@ public class CrabQuest extends BasicQuestHelper
 
 		inQuestInstance = new VarbitRequirement(VarbitID.CRAB_PUT_BACK_IN_INSTANCE, 1);
 		nineSlots = new FreeInventorySlotRequirement(9);
+		threeSlots = new FreeInventorySlotRequirement(3);
+		twoSlots = new FreeInventorySlotRequirement(2);
+		oneSlot = new FreeInventorySlotRequirement(1);
 
 		shellOne = new ItemRequirement("Shell", ItemID.CRAB_SHELL_1);
 		shellTwo = new ItemRequirement("Shell", ItemID.CRAB_SHELL_2);
@@ -87,29 +88,32 @@ public class CrabQuest extends BasicQuestHelper
 		shellSix = new ItemRequirement("Shell", ItemID.CRAB_SHELL_6);
 		shellSeven = new ItemRequirement("Shell", ItemID.CRAB_SHELL_7);
 
-		seasoakedBowstring = new ItemRequirement("Sea-soaked Bowstring", ItemID.CRAB_BOWSTRING);
+		seaSoakedBowstring = new ItemRequirement("Sea-soaked Bowstring", ItemID.CRAB_BOWSTRING);
 		batteredBarrel = new ItemRequirement("Battered Barrel", ItemID.CRAB_BARREL);
 		weatheredRosewoodPlank = new ItemRequirement("Weathered Rosewood Plank", ItemID.CRAB_PLANK);
+		beforeFishing = new VarbitRequirement(VarbitID.CRAB_MAIN, 37, Operation.LESS);
+		pastFishing = new VarbitRequirement(VarbitID.CRAB_MAIN, 40, Operation.GREATER);
 
 		instrument = new ItemRequirement("Instrument", ItemID.CRAB_BASS);
 
-		shell1Obtained = or(shellOne, new VarbitRequirement(VarbitID.CRAB_SEASHELL_1, 1));
-		shell2Obtained = or(shellTwo, new VarbitRequirement(VarbitID.CRAB_SEASHELL_2, 1));
-		shell3Obtained = or(shellThree, new VarbitRequirement(VarbitID.CRAB_SEASHELL_3, 1));
-		shell4Obtained = or(shellFour, new VarbitRequirement(VarbitID.CRAB_SEASHELL_4, 1));
-		shell5Obtained = or(shellFive, new VarbitRequirement(VarbitID.CRAB_SEASHELL_5, 1));
-		shell6Obtained = or(shellSix, new VarbitRequirement(VarbitID.CRAB_SEASHELL_6, 1));
-		shell7Obtained = or(shellSeven, new VarbitRequirement(VarbitID.CRAB_SEASHELL_7, 1));
+		shellOneObtained = or(shellOne, new VarbitRequirement(VarbitID.CRAB_SEASHELL_1, 1));
+		shellTwoObtained = or(shellTwo, new VarbitRequirement(VarbitID.CRAB_SEASHELL_2, 1));
+		shellThreeObtained = or(shellThree, new VarbitRequirement(VarbitID.CRAB_SEASHELL_3, 1));
+		shellFourObtained = or(shellFour, new VarbitRequirement(VarbitID.CRAB_SEASHELL_4, 1));
+		shellFiveObtained = or(shellFive, new VarbitRequirement(VarbitID.CRAB_SEASHELL_5, 1));
+		shellSixObtained = or(shellSix, new VarbitRequirement(VarbitID.CRAB_SEASHELL_6, 1));
+		shellSevenObtained = or(shellSeven, new VarbitRequirement(VarbitID.CRAB_SEASHELL_7, 1));
 		shellsObtained = or(and(
-								shell1Obtained, shell2Obtained, shell3Obtained, shell4Obtained,
-								shell5Obtained, shell6Obtained, shell7Obtained
-								),
-							new VarbitRequirement(VarbitID.CRAB_SEASHELLS, 127));
+				shellOneObtained, shellTwoObtained, shellThreeObtained, shellFourObtained,
+				shellFiveObtained, shellSixObtained, shellSevenObtained
+			),
+			new VarbitRequirement(VarbitID.CRAB_SEASHELLS, 127));
 
 		floatsamPresent = not(new VarbitRequirement(VarbitID.CRAB_FLOATSAM_HIDDEN, 3));
 
-
-		partialComplete = new VarbitRequirement(VarbitID.CRAB_PARTIAL_COMPLETE, 1);
+		penguinPresent = new NpcCondition(NpcID.CRAB_PENGUIN, new WorldPoint(3049, 2658, 0));
+		penguinKicked = new VarbitRequirement(VarbitID.CRAB_KICKED_PENGUIN, 1);
+		sufficientBandmatesRecruited = new VarbitRequirement(VarbitID.CRAB_PARTIAL_COMPLETE, 1);
 	}
 
 	public void setupSteps()
@@ -118,7 +122,7 @@ public class CrabQuest extends BasicQuestHelper
 			ObjectID.CRAB_BOTTLE,
 			new WorldPoint(3055, 2639, 0),
 			"Drink from the Bottle on the shore of Dognose Island.",
-			sailingLevel, fishingLevel, bigFishingNet, nineSlots, not(inQuestInstance));
+			sailingLevel, fishingLevel, not(inQuestInstance));
 		drinkFromBottle.addDialogStep("Yes.");
 
 		talkToCrab = new NpcStep(this,
@@ -168,39 +172,37 @@ public class CrabQuest extends BasicQuestHelper
 			"Show the shells to the crab.",
 			shellsObtained);
 
-		pickUpBigNet = new ItemStep(this,
+		pickUpBigFishingNet = new ItemStep(this,
 			new WorldPoint(3061, 2646, 0),
 			"Pick up the nearby Big Fishing Net.",
 			bigFishingNet);
 
-		fishSeasoakedBowstring = new NpcStep(this,
+		fishSeaSoakedBowstring = new NpcStep(this,
 			NpcID.CRAB_FLOATSAM_1,
 			/* new WorldPoint(3048, 2632, 0), */
 			"Fish a Sea-soaked bowstring from the nearby Floatsam.",
-			bigFishingNet, floatsamPresent);
-		fishSeasoakedBowstring.addAlternateNpcs(NpcID.CRAB_FLOATSAM_2, NpcID.CRAB_FLOATSAM_3);
+			bigFishingNet, threeSlots);
+		fishSeaSoakedBowstring.addAlternateNpcs(NpcID.CRAB_FLOATSAM_2, NpcID.CRAB_FLOATSAM_3);
 
 		fishBatteredBarrel = new NpcStep(this,
 			NpcID.CRAB_FLOATSAM_1,
 			"Fish a Battered Barrel from the nearby Floatsam.",
-			seasoakedBowstring, bigFishingNet, floatsamPresent);
+			seaSoakedBowstring, bigFishingNet, twoSlots);
 		fishBatteredBarrel.addAlternateNpcs(NpcID.CRAB_FLOATSAM_2, NpcID.CRAB_FLOATSAM_3);
 
 		fishWeatheredRosewoodPlank = new NpcStep(this,
 			NpcID.CRAB_FLOATSAM_1,
 			"Fish a Weathered Rosewood Plank from the nearby Floatsam.",
-			seasoakedBowstring, batteredBarrel, bigFishingNet, floatsamPresent);
+			seaSoakedBowstring, batteredBarrel, bigFishingNet, oneSlot);
 		fishWeatheredRosewoodPlank.addAlternateNpcs(NpcID.CRAB_FLOATSAM_2, NpcID.CRAB_FLOATSAM_3);
 
 		resetFloatsam = new NpcStep(this,
 			NpcID.CRAB_MAINCRAB,
-			"Speak to the crab to reset the floatsam.",
-			not(floatsamPresent));
-		resetFloatsam.setShowInSidebar(false);
+			"Speak to the crab to reset the floatsam.");
 
 		assembleInstrument = new ItemStep(this,
 			"Assemble the instrument using the items in your inventory.",
-			seasoakedBowstring.highlighted(),
+			seaSoakedBowstring.highlighted(),
 			batteredBarrel.highlighted(),
 			weatheredRosewoodPlank.highlighted());
 
@@ -211,29 +213,31 @@ public class CrabQuest extends BasicQuestHelper
 		turnInInstrument.addDialogStep("A disaster.");
 		turnInInstrument.addDialogStep("Let me show you!");
 
-		crab1 = new CrabStep(this, ObjectID.CRAB_ENAKH_LEAFLESSBUSH, new WorldPoint(3051, 2636, 0),
-			);
-		crab1Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3051, 2636, 0));
-		crab2Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3056, 2640, 0));
-		// crab3 one needs double-checking. I completed this step before taking the tile locations.
-		crab3Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3041, 2649, 0));
-		crab4Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3040, 2647, 0));
-		crab5Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3037, 2646, 0));
-		crab6Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3038, 2644, 0));
-		crab7Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3038, 2638, 0));
-		crab8Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3041, 2637, 0));
-		crab9Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3042, 2639, 0));
-		crab10Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3045, 2653, 0));
-		crab11Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3047, 2655, 0));
-		penguinRevealed = new NpcCondition(NpcID.CRAB_PENGUIN, new WorldPoint(3049, 2658, 0));
-		crab12Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3049, 2657, 0));
-	//	crab13Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3050, 2656, 0));
-		crab14Revealed = new NpcCondition(NpcID.CRAB_BANDCRAB, new WorldPoint(3053, 2656, 0));
+		findPenguin = new ObjectStep(this, ObjectID.CRAB_PALM_UPDATE01,
+			new WorldPoint(3048, 2658, 0),
+			"Check the palm to find a penguin.");
+
+		kickPenguin = new NpcStep(this, NpcID.CRAB_PENGUIN, new WorldPoint(3049, 2658, 0),
+			"Speak to the penguin.");
+
+		findCrabs = new ObjectStep(this, ObjectID.CRAB_ENAKH_LEAFLESSBUSH,
+			new WorldPoint(3050, 2636, 0),
+			"Interact with the nearby plants to find crabs.\n" +
+				"Speak with the crabs to recruit them to join the band.\n" +
+				"If you are prompted that the crabs might be shy, perform the Sit emote for a short time.\n",
+			true);
+		findCrabs.addAlternateObjects(ObjectID.CRAB_AVIUM_TREE_1, ObjectID.CRAB_AVIUM_TREE_2,
+			ObjectID.CRAB_GROUNDCOVER_PLANT4_WITHERED, ObjectID.CRAB_MAGICTREE, ObjectID.CRAB_PALM_UPDATE01,
+			ObjectID.CRAB_PALM_UPDATE02, ObjectID.CRAB_PALM_UPDATE03);
+		findCrabs.setHideWorldArrow(true);
+		findCrabs.addDialogStep("1, 2, 3, 10, 11, 12, 13, 20, 21, 22, 23...");
+		findCrabs.addDialogStep("Every 100 years.");
+		findCrabs.addDialogStep("On the beach.");
+		findCrabs.addDialogStep("You can't possibly expect me to know that!");
 
 		returnToTheBeach = new NpcStep(this,
 			NpcID.CRAB_MAINCRAB_END,
-			"Speak to the crab to finish the quest.",
-			partialComplete);
+			"Speak to the crab to finish the quest.");
 
 		returnToTheBeach.addDialogStep("Wait for leaders to turn up.");
 	}
@@ -254,65 +258,69 @@ public class CrabQuest extends BasicQuestHelper
 		steps.put(20, talkToCrabButHesShy);
 
 		var cShells = new ConditionalStep(this, turnInShells);
-		cShells.addStep(not(shell3Obtained), pickUpShellThree);
-		cShells.addStep(not(shell6Obtained), pickUpShellSix);
-		cShells.addStep(not(shell1Obtained), pickUpShellOne);
-		cShells.addStep(not(shell7Obtained), pickUpShellSeven);
-		cShells.addStep(not(shell4Obtained), pickUpShellFour);
-		cShells.addStep(not(shell2Obtained), pickUpShellTwo);
-		cShells.addStep(not(shell5Obtained), pickUpShellFive);
+		cShells.addStep(and(not(oneSlot),
+			or(shellOne,
+				shellTwo,
+				shellThree,
+				shellFour,
+				shellFive,
+				shellSix,
+				shellSeven)), turnInShells);
+		cShells.addStep(not(shellThreeObtained), pickUpShellThree);
+		cShells.addStep(not(shellSixObtained), pickUpShellSix);
+		cShells.addStep(not(shellOneObtained), pickUpShellOne);
+		cShells.addStep(not(shellSevenObtained), pickUpShellSeven);
+		cShells.addStep(not(shellFourObtained), pickUpShellFour);
+		cShells.addStep(not(shellTwoObtained), pickUpShellTwo);
+		cShells.addStep(not(shellFiveObtained), pickUpShellFive);
 		steps.put(25, cShells);
 		steps.put(30, turnInShells);
 		steps.put(35, turnInShells);
 
-		var cInstrument = new ConditionalStep(this, assembleInstrument, seasoakedBowstring, batteredBarrel,
-			                                                                      weatheredRosewoodPlank);
-		cInstrument.addStep(and(not(and(seasoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
-							    not(bigFishingNet)), pickUpBigNet);
-		cInstrument.addStep(and(not(and(seasoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
-							    not(floatsamPresent)), resetFloatsam);
-		cInstrument.addStep(not(seasoakedBowstring), fishSeasoakedBowstring);
+		var cInstrument = new ConditionalStep(this, assembleInstrument, seaSoakedBowstring, batteredBarrel,
+			weatheredRosewoodPlank);
+		cInstrument.addStep(and(not(and(seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
+			not(bigFishingNet)), pickUpBigFishingNet);
+		cInstrument.addStep(and(not(and(seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
+			not(floatsamPresent)), resetFloatsam);
+		cInstrument.addStep(not(seaSoakedBowstring), fishSeaSoakedBowstring);
 		cInstrument.addStep(not(batteredBarrel), fishBatteredBarrel);
 		cInstrument.addStep(not(weatheredRosewoodPlank), fishWeatheredRosewoodPlank);
 		steps.put(37, cInstrument);
 
 		var cInstrumentSafety = new ConditionalStep(this, turnInInstrument, instrument);
 		cInstrumentSafety.addStep(and(not(instrument),
-			                          not(and(seasoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
-									  not(bigFishingNet)), pickUpBigNet);
+			not(and(seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
+			not(bigFishingNet)), pickUpBigFishingNet);
 		cInstrumentSafety.addStep(and(not(instrument),
-			                          not(and(seasoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
-									  not(floatsamPresent)), resetFloatsam);
-		cInstrumentSafety.addStep(and(not(instrument), not(seasoakedBowstring)), fishSeasoakedBowstring);
+			not(and(seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
+			not(floatsamPresent)), resetFloatsam);
+		cInstrumentSafety.addStep(and(not(instrument), not(seaSoakedBowstring)), fishSeaSoakedBowstring);
 		cInstrumentSafety.addStep(and(not(instrument), not(batteredBarrel)), fishBatteredBarrel);
 		cInstrumentSafety.addStep(and(not(instrument), not(weatheredRosewoodPlank)), fishWeatheredRosewoodPlank);
-		cInstrumentSafety.addStep(and(not(instrument), seasoakedBowstring, batteredBarrel, weatheredRosewoodPlank),
-			                      assembleInstrument);
+		cInstrumentSafety.addStep(and(not(instrument), seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank),
+			assembleInstrument);
 		steps.put(40, cInstrumentSafety);
 
 		steps.put(45, turnInInstrument);
 
-		var cRustacean = new ConditionalStep(this, returnToTheBeach, partialComplete);
-//		cRustacean.addStep(and(not(crab8Recruited), not(bandmemberRevealed)), revealCrab8);
-		cRustacean.addStep(not(crab8Recruited), talkToCrab8);
-//		cRustacean.addStep(and(not(crab2Recruited), not(bandmemberRevealed)), revealCrab2);
-		cRustacean.addStep(not(crab2Recruited), talkToCrab2);
-//		cRustacean.addStep(and(not(crab10Recruited), not(bandmemberRevealed)), revealCrab10);
-		cRustacean.addStep(not(crab10Recruited), talkToCrab10);
-//		cRustacean.addStep(and(not(crab7Recruited), not(bandmemberRevealed)), revealCrab7);
-		cRustacean.addStep(not(crab7Recruited), talkToCrab7);
-//		cRustacean.addStep(and(not(crab4Recruited), not(bandmemberRevealed)), revealCrab4);
-		cRustacean.addStep(not(crab4Recruited), talkToCrab4);
-//		cRustacean.addStep(and(not(crab3Recruited), not(bandmemberRevealed)), revealCrab3);
-		cRustacean.addStep(not(crab3Recruited), talkToCrab3);
+		var cRustacean = new ConditionalStep(this, returnToTheBeach);
+		cRustacean.addStep(and(not(penguinPresent), not(penguinKicked)), findPenguin);
+		cRustacean.addStep(not(penguinKicked), kickPenguin);
+		cRustacean.addStep(not(sufficientBandmatesRecruited), findCrabs);
 		steps.put(47, cRustacean);
 
 		steps.put(50, returnToTheBeach);
+		steps.put(55, returnToTheBeach);
+		steps.put(60, returnToTheBeach);
 
 		// Guide the player back if they're not in the instance.
 		steps.replaceAll((stage, normalStep) ->
 		{
-			if (stage == 0) return normalStep;
+			if (stage == 0)
+			{
+				return normalStep;
+			}
 			return new ConditionalStep(this, normalStep).addStep(not(inQuestInstance), drinkFromBottle);
 		});
 
@@ -323,7 +331,17 @@ public class CrabQuest extends BasicQuestHelper
 	public List<Requirement> getGeneralRecommended()
 	{
 		return List.of(
+			nineSlots
+		);
+	}
 
+	@Override
+	public List<Requirement> getGeneralRequirements()
+	{
+		return List.of(
+			sailingLevel,
+			fishingLevel,
+			threeSlots
 		);
 	}
 
@@ -373,25 +391,30 @@ public class CrabQuest extends BasicQuestHelper
 		sections.add(new PanelDetails("Collecting shells", List.of(
 			pickUpShellThree, pickUpShellSix, pickUpShellOne, pickUpShellSeven,
 			pickUpShellFour, pickUpShellTwo, pickUpShellFive, turnInShells
-		)));
+		), oneSlot));
+
+		PanelDetails netPanel = new PanelDetails("Prepare to fish up an instrument", List.of(
+			pickUpBigFishingNet
+		), oneSlot);
+		netPanel.setHideCondition(or(bigFishingNet, pastFishing));
+		sections.add(netPanel);
+
+		PanelDetails resetPanel = new PanelDetails("Reset the floatsam", List.of(
+			resetFloatsam
+		));
+		resetPanel.setHideCondition(or(beforeFishing, floatsamPresent, pastFishing));
+		sections.add(resetPanel);
 
 		sections.add(new PanelDetails("Assembling an instrument", List.of(
-			pickUpBigNet,
-			fishSeasoakedBowstring,
+			fishSeaSoakedBowstring,
 			fishBatteredBarrel,
 			fishWeatheredRosewoodPlank,
-			resetFloatsam,
 			assembleInstrument,
 			turnInInstrument
-		)));
+		), threeSlots));
 
-		sections.add(new PanelDetails("Recruit some bandmembers", List.of(
-			revealCrab8, talkToCrab8,
-			revealCrab2, talkToCrab2,
-			revealCrab10, talkToCrab10,
-			revealCrab7, talkToCrab7,
-			revealCrab4, talkToCrab4,
-			revealCrab3, talkToCrab3
+		sections.add(new PanelDetails("Recruit some band members", List.of(
+			findPenguin, kickPenguin, findCrabs
 		)));
 
 		sections.add(new PanelDetails("Attend the concert", List.of(
