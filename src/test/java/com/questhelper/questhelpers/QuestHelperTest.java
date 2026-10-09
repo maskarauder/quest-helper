@@ -406,7 +406,7 @@ public class QuestHelperTest extends MockedTest
 
 		// Used to simulate the criteria for resetFLoatsam to appear in the side panel.
 		// Can remove this and modify the side panel behavior if it's preferred.
-		when(client.getVarbitValue(VarbitID.CRAB_MAIN)).thenReturn(37);
+		when(client.getVarbitValue(VarbitID.CRAB_MAIN)).thenReturn(35);
 		when(client.getVarbitValue(VarbitID.CRAB_FLOATSAM_HIDDEN)).thenReturn(3);
 
 		AchievementDiaryStepManager.setup(configManager);

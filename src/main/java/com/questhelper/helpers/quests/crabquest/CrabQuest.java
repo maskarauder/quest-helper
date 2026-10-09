@@ -90,7 +90,7 @@ public class CrabQuest extends BasicQuestHelper
 		seaSoakedBowstring = new ItemRequirement("Sea-soaked Bowstring", ItemID.CRAB_BOWSTRING);
 		batteredBarrel = new ItemRequirement("Battered Barrel", ItemID.CRAB_BARREL);
 		weatheredRosewoodPlank = new ItemRequirement("Weathered Rosewood Plank", ItemID.CRAB_PLANK);
-		beforeFishing = new VarbitRequirement(VarbitID.CRAB_MAIN, 37, Operation.LESS);
+		beforeFishing = new VarbitRequirement(VarbitID.CRAB_MAIN, 35, Operation.LESS);
 		pastFishing = new VarbitRequirement(VarbitID.CRAB_MAIN, 40, Operation.GREATER);
 
 		instrument = new ItemRequirement("Instrument", ItemID.CRAB_BASS);
@@ -221,9 +221,10 @@ public class CrabQuest extends BasicQuestHelper
 
 		findCrabs = new ObjectStep(this, ObjectID.CRAB_ENAKH_LEAFLESSBUSH,
 			new WorldPoint(3050, 2636, 0),
-			"Interact with the nearby plants to find crabs.\n" +
-				"Speak with the crabs to recruit them to join the band.\n" +
-				"If you are prompted that the crabs might be shy, perform the Sit emote for a short time.\n",
+			"Interact with the nearby plants to find crabs. " +
+				"Speak with the crabs to recruit them to join the band. " +
+				"If you are prompted that the crabs might be scared, perform the Sit emote for a short time " +
+				"until a crab appears.",
 			true);
 		findCrabs.addAlternateObjects(ObjectID.CRAB_AVIUM_TREE_1, ObjectID.CRAB_AVIUM_TREE_2,
 			ObjectID.CRAB_GROUNDCOVER_PLANT4_WITHERED, ObjectID.CRAB_MAGICTREE, ObjectID.CRAB_PALM_UPDATE01,
@@ -274,7 +275,6 @@ public class CrabQuest extends BasicQuestHelper
 		cShells.addStep(not(shellFiveObtained), pickUpShellFive);
 		steps.put(25, cShells);
 		steps.put(30, turnInShells);
-		steps.put(35, turnInShells);
 
 		var cInstrument = new ConditionalStep(this, assembleInstrument, seaSoakedBowstring, batteredBarrel,
 			weatheredRosewoodPlank);
@@ -285,6 +285,7 @@ public class CrabQuest extends BasicQuestHelper
 		cInstrument.addStep(not(seaSoakedBowstring), fishSeaSoakedBowstring);
 		cInstrument.addStep(not(batteredBarrel), fishBatteredBarrel);
 		cInstrument.addStep(not(weatheredRosewoodPlank), fishWeatheredRosewoodPlank);
+		steps.put(35, cInstrument);
 		steps.put(37, cInstrument);
 
 		var cInstrumentSafety = new ConditionalStep(this, turnInInstrument, instrument);
