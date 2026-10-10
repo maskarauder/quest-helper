@@ -151,8 +151,6 @@ public class ObjectStep extends DetailedQuestStep
 	{
 		// TODO: This needs to be tested in Shadow of the Storm's Demon Room
 		objects.clear();
-		// worldViews() only returns the sub-worldviews (e.g. boats), so the top level must be loaded separately
-		loadObjectsInWorldView(client.getTopLevelWorldView());
 		for (WorldView worldView : client.getTopLevelWorldView().worldViews())
 		{
 			loadObjectsInWorldView(worldView);
