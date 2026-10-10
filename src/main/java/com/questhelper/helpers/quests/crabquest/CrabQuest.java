@@ -17,6 +17,7 @@ import com.questhelper.rewards.ExperienceReward;
 import com.questhelper.rewards.QuestPointReward;
 import com.questhelper.rewards.UnlockReward;
 import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.ItemStep;
 import com.questhelper.steps.NpcStep;
 import com.questhelper.steps.ObjectStep;
@@ -39,7 +40,7 @@ public class CrabQuest extends BasicQuestHelper
 	SkillRequirement sailingLevel;
 	SkillRequirement fishingLevel;
 	ItemRequirement bigFishingNet;
-	FreeInventorySlotRequirement nineSlots, threeSlots, twoSlots, oneSlot;
+	FreeInventorySlotRequirement nineSlots, fourSlots, threeSlots, twoSlots, oneSlot;
 
 	// Quest Reqs
 	ItemRequirement shellOne, shellTwo, shellThree, shellFour, shellFive, shellSix, shellSeven;
@@ -56,6 +57,7 @@ public class CrabQuest extends BasicQuestHelper
 	NpcStep talkToCrab, talkToCrabButHesShy;
 	ItemStep pickUpShellOne, pickUpShellTwo, pickUpShellThree, pickUpShellFour, pickUpShellFive, pickUpShellSix,
 		pickUpShellSeven;
+	DetailedQuestStep pickUpShells;
 	NpcStep turnInShells;
 	ItemStep pickUpBigFishingNet;
 	NpcStep resetFloatsam, fishSeaSoakedBowstring, fishBatteredBarrel, fishWeatheredRosewoodPlank;
@@ -75,6 +77,7 @@ public class CrabQuest extends BasicQuestHelper
 
 		inQuestInstance = new VarbitRequirement(VarbitID.CRAB_PUT_BACK_IN_INSTANCE, 1);
 		nineSlots = new FreeInventorySlotRequirement(9);
+		fourSlots = new FreeInventorySlotRequirement(4);
 		threeSlots = new FreeInventorySlotRequirement(3);
 		twoSlots = new FreeInventorySlotRequirement(2);
 		oneSlot = new FreeInventorySlotRequirement(1);
@@ -121,7 +124,7 @@ public class CrabQuest extends BasicQuestHelper
 			ObjectID.CRAB_BOTTLE,
 			new WorldPoint(3055, 2639, 0),
 			"Drink from the Bottle on the shore of Dognose Island.",
-			sailingLevel, fishingLevel, not(inQuestInstance));
+			sailingLevel, fishingLevel);
 		drinkFromBottle.addDialogStep("Yes.");
 
 		talkToCrab = new NpcStep(this,
@@ -168,13 +171,19 @@ public class CrabQuest extends BasicQuestHelper
 			shellFive);
 
 		turnInShells = new NpcStep(this, NpcID.CRAB_MAINCRAB_START,
-			"Show the shells to the crab.",
-			shellsObtained);
+			"Show the shells to the crab.");
+
+		pickUpShells = new DetailedQuestStep(this,
+			"Pick up some nearby seashells. " +
+				"If your inventory fills up, you can talk to the crab to turn them in.");
+
+		pickUpShells.addSubSteps(pickUpShellThree, pickUpShellSix, pickUpShellOne, pickUpShellSeven,
+			pickUpShellFour, pickUpShellTwo, pickUpShellFive, turnInShells);
 
 		pickUpBigFishingNet = new ItemStep(this,
 			new WorldPoint(3061, 2646, 0),
 			"Pick up the nearby Big Fishing Net.",
-			bigFishingNet);
+			bigFishingNet, fourSlots);
 
 		fishSeaSoakedBowstring = new NpcStep(this,
 			NpcID.CRAB_FLOATSAM_1,
@@ -214,10 +223,10 @@ public class CrabQuest extends BasicQuestHelper
 
 		findPenguin = new ObjectStep(this, ObjectID.CRAB_PALM_UPDATE01,
 			new WorldPoint(3048, 2658, 0),
-			"Check the palm to find a penguin.");
+			"Check the northernmost palm to find a 'crab'.");
 
 		kickPenguin = new NpcStep(this, NpcID.CRAB_PENGUIN, new WorldPoint(3049, 2658, 0),
-			"Speak to the penguin.");
+			"Speak to the 'crab'.");
 
 		findCrabs = new ObjectStep(this, ObjectID.CRAB_ENAKH_LEAFLESSBUSH,
 			new WorldPoint(3050, 2636, 0),
@@ -250,14 +259,19 @@ public class CrabQuest extends BasicQuestHelper
 
 		var steps = new HashMap<Integer, QuestStep>();
 
-		steps.put(0, drinkFromBottle);
-
-		steps.put(5, talkToCrab);
-		steps.put(10, talkToCrab);
-		steps.put(15, talkToCrab);
-		steps.put(20, talkToCrabButHesShy);
+		steps.put(0, new ConditionalStep(this, drinkFromBottle)
+			.addStep(not(inQuestInstance), drinkFromBottle));
+		steps.put(5, new ConditionalStep(this, talkToCrab)
+			.addStep(not(inQuestInstance), drinkFromBottle));
+		steps.put(10, new ConditionalStep(this, talkToCrab)
+			.addStep(not(inQuestInstance), drinkFromBottle));
+		steps.put(15, new ConditionalStep(this, talkToCrab)
+			.addStep(not(inQuestInstance), drinkFromBottle));
+		steps.put(20, new ConditionalStep(this, talkToCrabButHesShy)
+			.addStep(not(inQuestInstance), drinkFromBottle));
 
 		var cShells = new ConditionalStep(this, turnInShells);
+		cShells.addStep(not(inQuestInstance), drinkFromBottle);
 		cShells.addStep(and(not(oneSlot),
 			or(shellOne,
 				shellTwo,
@@ -278,6 +292,7 @@ public class CrabQuest extends BasicQuestHelper
 
 		var cInstrument = new ConditionalStep(this, assembleInstrument, seaSoakedBowstring, batteredBarrel,
 			weatheredRosewoodPlank);
+		cInstrument.addStep(not(inQuestInstance), drinkFromBottle);
 		cInstrument.addStep(and(not(and(seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
 			not(bigFishingNet)), pickUpBigFishingNet);
 		cInstrument.addStep(and(not(and(seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
@@ -289,6 +304,7 @@ public class CrabQuest extends BasicQuestHelper
 		steps.put(37, cInstrument);
 
 		var cInstrumentSafety = new ConditionalStep(this, turnInInstrument, instrument);
+		cInstrumentSafety.addStep(not(inQuestInstance), drinkFromBottle);
 		cInstrumentSafety.addStep(and(not(instrument),
 			not(and(seaSoakedBowstring, batteredBarrel, weatheredRosewoodPlank)),
 			not(bigFishingNet)), pickUpBigFishingNet);
@@ -302,27 +318,22 @@ public class CrabQuest extends BasicQuestHelper
 			assembleInstrument);
 		steps.put(40, cInstrumentSafety);
 
-		steps.put(45, turnInInstrument);
+		steps.put(45, new ConditionalStep(this, turnInInstrument)
+			.addStep(not(inQuestInstance), drinkFromBottle));
 
 		var cRustacean = new ConditionalStep(this, returnToTheBeach);
+		cRustacean.addStep(not(inQuestInstance), drinkFromBottle);
 		cRustacean.addStep(and(not(penguinPresent), not(penguinKicked)), findPenguin);
 		cRustacean.addStep(not(penguinKicked), kickPenguin);
 		cRustacean.addStep(not(sufficientBandmatesRecruited), findCrabs);
 		steps.put(47, cRustacean);
 
-		steps.put(50, returnToTheBeach);
-		steps.put(55, returnToTheBeach);
-		steps.put(60, returnToTheBeach);
-
-		// Guide the player back if they're not in the instance.
-		steps.replaceAll((stage, normalStep) ->
-		{
-			if (stage == 0)
-			{
-				return normalStep;
-			}
-			return new ConditionalStep(this, normalStep).addStep(not(inQuestInstance), drinkFromBottle);
-		});
+		steps.put(50, new ConditionalStep(this, returnToTheBeach)
+			.addStep(not(inQuestInstance), drinkFromBottle));
+		steps.put(55, new ConditionalStep(this, returnToTheBeach)
+			.addStep(not(inQuestInstance), drinkFromBottle));
+		steps.put(60, new ConditionalStep(this, returnToTheBeach)
+			.addStep(not(inQuestInstance), drinkFromBottle));
 
 		return steps;
 	}
@@ -385,33 +396,19 @@ public class CrabQuest extends BasicQuestHelper
 		sections.add(new PanelDetails("Starting off", List.of(
 			drinkFromBottle,
 			talkToCrab,
-			talkToCrabButHesShy
-		)));
-
-		sections.add(new PanelDetails("Collecting shells", List.of(
-			pickUpShellThree, pickUpShellSix, pickUpShellOne, pickUpShellSeven,
-			pickUpShellFour, pickUpShellTwo, pickUpShellFive, turnInShells
+			talkToCrabButHesShy,
+			pickUpShells
 		), oneSlot));
 
-		PanelDetails netPanel = new PanelDetails("Prepare to fish up an instrument", List.of(
-			pickUpBigFishingNet
-		), oneSlot);
-		netPanel.setHideCondition(or(bigFishingNet, pastFishing));
-		sections.add(netPanel);
-
-		PanelDetails resetPanel = new PanelDetails("Reset the floatsam", List.of(
-			resetFloatsam
-		));
-		resetPanel.setHideCondition(or(beforeFishing, floatsamPresent, pastFishing));
-		sections.add(resetPanel);
-
 		sections.add(new PanelDetails("Assembling an instrument", List.of(
+			pickUpBigFishingNet,
+			resetFloatsam,
 			fishSeaSoakedBowstring,
 			fishBatteredBarrel,
 			fishWeatheredRosewoodPlank,
 			assembleInstrument,
 			turnInInstrument
-		), threeSlots));
+		), bigFishingNet, threeSlots));
 
 		sections.add(new PanelDetails("Recruit some band members", List.of(
 			findPenguin, kickPenguin, findCrabs
