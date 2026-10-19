@@ -32,6 +32,7 @@ import com.google.inject.Provides;
 import com.questhelper.bank.banktab.BankTabItems;
 import com.questhelper.bank.banktab.PotionStorage;
 import com.questhelper.bank.banktab.QuestBankTabInterface;
+import com.questhelper.i18n.QuestTranslations;
 import com.questhelper.managers.*;
 import com.questhelper.panel.QuestHelperPanel;
 import com.questhelper.questhelpers.QuestHelper;
@@ -128,6 +129,10 @@ public class QuestHelperPlugin extends Plugin
 
 	@Getter
 	@Inject
+	private QuestTranslations translations;
+
+	@Getter
+	@Inject
 	RuneliteObjectManager runeliteObjectManager;
 
 	@Getter
@@ -196,6 +201,8 @@ public class QuestHelperPlugin extends Plugin
 	@Override
 	protected void startUp() throws IOException
 	{
+		translations.setLanguage(config.language());
+
 		questBankManager.startUp(injector, eventBus);
 		QuestContainerManager.getBankData().setSpecialMethodToObtainItems(() -> questBankManager.getBankItems().toArray(new Item[0]));
 		QuestContainerManager.getGroupStorageData().setSpecialMethodToObtainItems(() -> questBankManager.getGroupBankItems().toArray(new Item[0]));

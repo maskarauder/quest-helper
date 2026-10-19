@@ -475,24 +475,24 @@ public abstract class QuestStep implements Module
 
 		additionalText.stream()
 			.filter(s -> !s.isEmpty())
-			.forEach(line -> addTextToPanel(panelComponent, line));
+			.forEach(line -> addTextToPanel(panelComponent, plugin, line));
 
 		if (text != null && (!text.isEmpty() && !text.get(0).isEmpty()))
 		{
-			addTextToPanel(panelComponent, "");
+			addTextToPanel(panelComponent, plugin, "");
 		}
 
 		if (!overlayText.isEmpty())
 		{
 			overlayText.stream()
 				.filter(s -> !s.isEmpty())
-				.forEach(line -> addTextToPanel(panelComponent, line));
+				.forEach(line -> addTextToPanel(panelComponent, plugin, line));
 		}
 		else if (text != null)
 		{
 			text.stream()
 				.filter(s -> !s.isEmpty())
-				.forEach(line -> addTextToPanel(panelComponent, line));
+				.forEach(line -> addTextToPanel(panelComponent, plugin, line));
 		}
 	}
 
@@ -503,10 +503,10 @@ public abstract class QuestStep implements Module
 			.build());
 	}
 
-	private void addTextToPanel(PanelComponent panelComponent, String line)
+	private void addTextToPanel(PanelComponent panelComponent, QuestHelperPlugin plugin, String line)
 	{
 		panelComponent.getChildren().add(LineComponent.builder()
-			.left(line)
+			.left(plugin.getTranslations().text(questHelper.getTranslationContext(), line))
 			.leftColor(TITLED_CONTENT_COLOR)
 			.build());
 	}

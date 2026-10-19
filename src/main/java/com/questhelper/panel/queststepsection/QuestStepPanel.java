@@ -96,7 +96,8 @@ public class QuestStepPanel extends AbstractQuestSection implements MouseListene
 		headerLabel.addMouseListener(this);
 		addMouseListener(this);
 
-		headerLabel.setText(panelDetails.getHeader());
+		headerLabel.setText(questHelperPlugin.getTranslations().text(
+			questHelper == null ? "common" : questHelper.getTranslationContext(), panelDetails.getHeader()));
 		headerLabel.setFont(FontManager.getRunescapeBoldFont());
 
 		headerLabel.setMinimumSize(new Dimension(1, headerLabel.getPreferredSize().height));
@@ -110,7 +111,9 @@ public class QuestStepPanel extends AbstractQuestSection implements MouseListene
 
 		viewControls = new JPanel(new GridLayout(1, 3, 10, 0));
 
-		SwingUtil.addModalTooltip(lockStep, "Mark section as incomplete", "Mark section as complete");
+		SwingUtil.addModalTooltip(lockStep,
+			questHelperPlugin.getTranslations().text("Mark section as incomplete"),
+			questHelperPlugin.getTranslations().text("Mark section as complete"));
 		lockStep.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		lockStep.addActionListener(ev -> lockSection(lockStep.isSelected()));
 		lockStep.setVisible(false);
@@ -142,7 +145,8 @@ public class QuestStepPanel extends AbstractQuestSection implements MouseListene
 
 		if (panelDetails.getRequirements() != null)
 		{
-			requiredItemsPanel = new QuestRequirementsPanel("Bring the following items:", panelDetails.getRequirements(), questManager, false);
+			requiredItemsPanel = new QuestRequirementsPanel(questHelperPlugin.getTranslations().text("Bring the following items:"),
+				panelDetails.getRequirements(), questManager, false);
 			bodyPanel.add(requiredItemsPanel, BorderLayout.NORTH);
 		}
 		else
@@ -152,8 +156,8 @@ public class QuestStepPanel extends AbstractQuestSection implements MouseListene
 
 		if (panelDetails.getRecommended() != null)
 		{
-			recommendedItemsPanel = new QuestRequirementsPanel("Optionally bring the following items:", panelDetails.getRecommended(), questManager,
-				false);
+			recommendedItemsPanel = new QuestRequirementsPanel(questHelperPlugin.getTranslations().text("Optionally bring the following items:"),
+				panelDetails.getRecommended(), questManager, false);
 			bodyPanel.add(recommendedItemsPanel, BorderLayout.CENTER);
 		}
 		else
@@ -432,7 +436,8 @@ public class QuestStepPanel extends AbstractQuestSection implements MouseListene
 				{
 					text.append("\n\n");
 				}
-				text.append(line);
+				text.append(questHelperPlugin.getTranslations().text(
+					step.getQuestHelper().getTranslationContext(), line));
 				first = false;
 			}
 		}

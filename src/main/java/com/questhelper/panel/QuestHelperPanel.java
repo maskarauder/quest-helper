@@ -74,7 +74,7 @@ public class QuestHelperPanel extends PluginPanel
 
 	private final QuestOverviewPanel questOverviewPanel;
 	private final FixedWidthPanel questOverviewWrapper = new FixedWidthPanel();
-	private final AssistLevelPanel assistLevelPanel = new AssistLevelPanel();
+	private final AssistLevelPanel assistLevelPanel;
 	private final JTextArea questListMessage;
 	private final JPanel searchQuestsPanel;
 
@@ -146,6 +146,7 @@ public class QuestHelperPanel extends PluginPanel
 		this.questHelperPlugin = questHelperPlugin;
 		this.questManager = questManager;
 		this.configManager = configManager;
+		assistLevelPanel = new AssistLevelPanel(questHelperPlugin.getTranslations());
 
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
@@ -169,7 +170,7 @@ public class QuestHelperPanel extends PluginPanel
 		JButton settingsBtn = new JButton();
 		SwingUtil.removeButtonDecorations(settingsBtn);
 		settingsBtn.setIcon(SETTINGS_ICON);
-		settingsBtn.setToolTipText("Change your settings");
+		settingsBtn.setToolTipText(questHelperPlugin.getTranslations().text("Change your settings"));
 		settingsBtn.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		settingsBtn.setUI(new BasicButtonUI());
 		settingsBtn.addActionListener((ev) -> {

@@ -24,6 +24,7 @@
  */
 package com.questhelper;
 
+import com.questhelper.i18n.QuestHelperLanguage;
 import com.questhelper.panel.questorders.QuestOrders;
 import com.questhelper.questhelpers.QuestDetails;
 import com.questhelper.questhelpers.QuestHelper;
@@ -235,6 +236,16 @@ public interface QuestHelperConfig extends Config
 		SQUARE,
 		OUTLINE,
 		FILLED_OUTLINE
+	}
+
+	@ConfigItem(
+		keyName = "language",
+		name = "Language (experimental)",
+		description = "Language for supported helper text. Disable and re-enable Quest Helper to apply. Untranslated text stays in English."
+	)
+	default QuestHelperLanguage language()
+	{
+		return QuestHelperLanguage.ENGLISH;
 	}
 
 	@ConfigItem(

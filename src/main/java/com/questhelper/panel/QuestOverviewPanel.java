@@ -26,6 +26,7 @@ package com.questhelper.panel;
 
 import com.questhelper.QuestHelperConfig;
 import com.questhelper.QuestHelperPlugin;
+import com.questhelper.i18n.QuestTranslations;
 import com.questhelper.managers.QuestManager;
 import com.questhelper.panel.queststepsection.AbstractQuestSection;
 import com.questhelper.panel.queststepsection.QuestSectionSection;
@@ -68,6 +69,7 @@ public class QuestOverviewPanel extends JPanel
 	@Getter
 	private final QuestHelperPlugin questHelperPlugin;
 	private final QuestManager questManager;
+	private final QuestTranslations translations;
 
 	public QuestHelper currentQuest;
 
@@ -102,6 +104,7 @@ public class QuestOverviewPanel extends JPanel
 		super();
 		this.questManager = questManager;
 		this.questHelperPlugin = questHelperPlugin;
+		this.translations = questHelperPlugin.getTranslations();
 
 		BoxLayout boxLayout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		setLayout(boxLayout);
@@ -120,7 +123,7 @@ public class QuestOverviewPanel extends JPanel
 		JButton closeBtn = new JButton();
 		SwingUtil.removeButtonDecorations(closeBtn);
 		closeBtn.setIcon(CLOSE_ICON);
-		closeBtn.setToolTipText("Close helper");
+		closeBtn.setToolTipText(translations.text("Close helper"));
 		closeBtn.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		closeBtn.setUI(new BasicButtonUI());
 		closeBtn.addActionListener(ev -> closeHelper());
@@ -152,7 +155,7 @@ public class QuestOverviewPanel extends JPanel
 		configHeaderPanel.setBorder(new EmptyBorder(5, 5, 5, 10));
 		JTextArea configHeaderText = JGenerator.makeJTextArea();
 		configHeaderText.setForeground(Color.WHITE);
-		configHeaderText.setText("Configuration:");
+		configHeaderText.setText(translations.text("Configuration:"));
 		configHeaderText.setMinimumSize(new Dimension(1, configHeaderPanel.getPreferredSize().height));
 		configHeaderPanel.add(configHeaderText);
 		configContainer.add(configHeaderPanel);
@@ -171,23 +174,23 @@ public class QuestOverviewPanel extends JPanel
 		BoxLayout boxLayoutOverview = new BoxLayout(overviewPanel, BoxLayout.Y_AXIS);
 		overviewPanel.setLayout(boxLayoutOverview);
 
-		questGeneralRequirementsPanel = new QuestRequirementsPanel("General requirements:", null, questManager, false);
+		questGeneralRequirementsPanel = new QuestRequirementsPanel(translations.text("General requirements:"), null, questManager, false);
 		overviewPanel.add(questGeneralRequirementsPanel);
 
-		questGeneralRecommendedPanel = new QuestRequirementsPanel("Recommended:", null, questManager, false);
+		questGeneralRecommendedPanel = new QuestRequirementsPanel(translations.text("Recommended:"), null, questManager, false);
 		overviewPanel.add(questGeneralRecommendedPanel);
 
-		questItemRequirementsPanel = new QuestRequirementsPanel("Item requirements:", null, questManager, true);
+		questItemRequirementsPanel = new QuestRequirementsPanel(translations.text("Item requirements:"), null, questManager, true);
 		overviewPanel.add(questItemRequirementsPanel);
 
-		questItemRecommendedPanel = new QuestRequirementsPanel("Recommended items:", null, questManager, true);
+		questItemRecommendedPanel = new QuestRequirementsPanel(translations.text("Recommended items:"), null, questManager, true);
 		overviewPanel.add(questItemRecommendedPanel);
 
-		var combatRequirements = QuestRequirementsPanel.createGenericGroup("Enemies to defeat:");
+		var combatRequirements = QuestRequirementsPanel.createGenericGroup(translations.text("Enemies to defeat:"));
 		questCombatRequirementsListPanel = combatRequirements.getRight();
 		overviewPanel.add(combatRequirements.getLeft());
 
-		var notes = QuestRequirementsPanel.createGenericGroup("Notes:");
+		var notes = QuestRequirementsPanel.createGenericGroup(translations.text("Notes:"));
 		questNotesPanel = notes.getLeft();
 		questNotesList = notes.getRight();
 		overviewPanel.add(questNotesPanel);
@@ -195,7 +198,7 @@ public class QuestOverviewPanel extends JPanel
 		questRewardsPanel = new QuestRewardsPanel();
 		overviewPanel.add(questRewardsPanel);
 
-		var externalResources = QuestRequirementsPanel.createGenericGroup("External Resources:");
+		var externalResources = QuestRequirementsPanel.createGenericGroup(translations.text("External Resources:"));
 		questExternalResourcesList = externalResources.getRight();
 		overviewPanel.add(externalResources.getLeft());
 
@@ -382,7 +385,7 @@ public class QuestOverviewPanel extends JPanel
 			configHeaderPanel.setBorder(new EmptyBorder(5, 5, 5, 10));
 			JTextArea configHeaderText = JGenerator.makeJTextArea();
 			configHeaderText.setForeground(Color.WHITE);
-			configHeaderText.setText("Configuration:");
+			configHeaderText.setText(translations.text("Configuration:"));
 			configHeaderText.setMinimumSize(new Dimension(1, configHeaderPanel.getPreferredSize().height));
 			configHeaderPanel.add(configHeaderText);
 			configContainer.add(configHeaderPanel);
@@ -569,10 +572,10 @@ public class QuestOverviewPanel extends JPanel
 		SwingUtil.removeButtonDecorations(wikiBtn);
 		wikiBtn.setHorizontalAlignment(SwingConstants.LEFT);
 		wikiBtn.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		wikiBtn.setToolTipText("Open the official wiki in your browser.");
+		wikiBtn.setToolTipText(translations.text("Open the official wiki in your browser."));
 
 		//Button variable properties
-		wikiBtn.setText("Open RuneScape Wiki");
+		wikiBtn.setText(translations.text("Open RuneScape Wiki"));
 
 		wikiBtn.addMouseListener(new java.awt.event.MouseAdapter()
 		{

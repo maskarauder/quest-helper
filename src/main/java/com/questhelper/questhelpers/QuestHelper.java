@@ -136,6 +136,14 @@ public abstract class QuestHelper implements Module, QuestDebugRenderer
 	}
 
 	/**
+	 * Catalog context for display translations. This does not change quest names or saved-state keys.
+	 */
+	public String getTranslationContext()
+	{
+		return quest == null ? "common" : quest.name();
+	}
+
+	/**
 	 * Human-readable quest title for UI (sidebar, overlays). Uses {@link #playerFacingQuestName} when set,
 	 * otherwise the linked {@link QuestHelperQuest} name, otherwise a generic label.
 	 */

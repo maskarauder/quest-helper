@@ -26,6 +26,7 @@ package com.questhelper.panel;
 
 import com.questhelper.QuestHelperConfig;
 import com.questhelper.config.AssistanceLevel;
+import com.questhelper.i18n.QuestTranslations;
 import com.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.ColorScheme;
@@ -40,6 +41,7 @@ import static com.questhelper.config.AssistanceLevel.ASSISTANCE_LEVEL_KEY;
 public class AssistLevelPanel extends JPanel
 {
 	private final FixedWidthPanel mainPanel;
+	private final QuestTranslations translations;
 	private ConfigManager configManager;
 	private QuestHelperPanel questHelperPanel;
 
@@ -48,9 +50,10 @@ public class AssistLevelPanel extends JPanel
 
 	private JButton[] buttons = new JButton[3];
 	
-	public AssistLevelPanel()
+	public AssistLevelPanel(QuestTranslations translations)
 	{
 		super(false);
+		this.translations = translations;
 
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
@@ -59,7 +62,7 @@ public class AssistLevelPanel extends JPanel
 		JPanel titlePanel = new FixedWidthPanel();
 		titlePanel.setLayout(new BorderLayout());
 
-		JTextArea title = JGenerator.makeJTextArea("Choose Assist Level");
+		JTextArea title = JGenerator.makeJTextArea(translations.text("Choose Assist Level"));
 		title.setForeground(Color.WHITE);
 		title.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0));
 
@@ -101,17 +104,17 @@ public class AssistLevelPanel extends JPanel
 		minAssistPanel.setLayout(new BorderLayout());
 
 		JTextArea title = JGenerator.makeJTextArea();
-		title.setText("Minimum Assistance");
+		title.setText(translations.text("Minimum Assistance"));
 		title.setForeground(Color.WHITE);
 		title.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0));
 
 		JTextArea description = JGenerator.makeJTextArea();
-		description.setText("This disables most overlay-based help, and hides puzzle solutions. This is a good option if you just want the sidebar with helpful information, " +
-				"as it will still track where you are in the quest, and show items needed.");
+		description.setText(translations.text("This disables most overlay-based help, and hides puzzle solutions. This is a good option if you just want the sidebar with helpful information, " +
+				"as it will still track where you are in the quest, and show items needed."));
 		description.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		JButton select = new JButton();
-		select.setText("Use minimum assistance");
+		select.setText(translations.text("Use minimum assistance"));
 		select.setPreferredSize(new Dimension(200, 50));
 		select.addActionListener(ev -> {
 			AssistanceLevel.setToMinimumAssistance(configManager);
@@ -140,16 +143,16 @@ public class AssistLevelPanel extends JPanel
 		JPanel medAssistPanel = new JPanel();
 		medAssistPanel.setLayout(new BorderLayout());
 
-		JTextArea title = JGenerator.makeJTextArea("Medium Assistance");
+		JTextArea title = JGenerator.makeJTextArea(translations.text("Medium Assistance"));
 		title.setForeground(Color.WHITE);
 		title.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0));
 
-		JTextArea description = JGenerator.makeJTextArea("This enables most overlay-based help, but hides puzzle solutions. " +
-				"This is a good option if you want to still have guidance, but still solve certain parts for yourself.");
+		JTextArea description = JGenerator.makeJTextArea(translations.text("This enables most overlay-based help, but hides puzzle solutions. " +
+				"This is a good option if you want to still have guidance, but still solve certain parts for yourself."));
 		description.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		JButton select = new JButton();
-		select.setText("Use medium assistance");
+		select.setText(translations.text("Use medium assistance"));
 		select.setPreferredSize(new Dimension(200, 50));
 		select.addActionListener(ev -> {
 			AssistanceLevel.setToMediumAssistance(configManager);
@@ -178,16 +181,16 @@ public class AssistLevelPanel extends JPanel
 		JPanel fullAssistPanel = new JPanel();
 		fullAssistPanel.setLayout(new BorderLayout());
 
-		JTextArea title = JGenerator.makeJTextArea("Full Assistance");
+		JTextArea title = JGenerator.makeJTextArea(translations.text("Full Assistance"));
 		title.setForeground(Color.WHITE);
 		title.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0));
 
-		JTextArea description = JGenerator.makeJTextArea("Gives you the full helper experience, highlighting objects & dialogue options, puzzler solvers, and " +
-				"with arrows so you know where to go.");
+		JTextArea description = JGenerator.makeJTextArea(translations.text("Gives you the full helper experience, highlighting objects & dialogue options, puzzler solvers, and " +
+				"with arrows so you know where to go."));
 		description.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		JButton select = new JButton();
-		select.setText("Use full assistance");
+		select.setText(translations.text("Use full assistance"));
 		select.setPreferredSize(new Dimension(200, 50));
 		select.addActionListener(ev -> {
 			AssistanceLevel.setToFullAssistance(configManager);
